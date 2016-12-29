@@ -1,0 +1,295 @@
+<html>
+<head>
+       <title></title>
+    <script type="text/javascript">
+        window.onload = startDemo;
+ 
+        function Point3D(x,y,z) {
+            this.x = x;
+            this.y = y;
+            this.z = z;
+ 
+            this.rotateX = function(angle) {
+                var rad, cosa, sina, y, z;
+                rad = angle * Math.PI / 180;
+                cosa = Math.cos(rad);
+                sina = Math.sin(rad);
+                y = this.y * cosa - this.z * sina;
+                z = this.y * sina + this.z * cosa;
+                return new Point3D(this.x, y, z);
+            }
+		
+
+		this.rotateXc = function(angle) {
+                var rad, cosa, sina, y, z;
+                rad = angle * Math.PI / 180;
+                cosa = Math.cos(rad);
+                sina = Math.sin(rad);
+                y = this.y * cosa + this.z * sina;
+                z = this.z * cosa - this.y * sina;
+                return new Point3D(this.x, y, z);
+            }
+
+
+
+ 
+            this.rotateY = function(angle) {
+                var rad, cosa, sina, x, z;
+                rad = angle * Math.PI / 180;
+                cosa = Math.cos(rad);
+                sina = Math.sin(rad);
+                z = this.z * cosa - this.x * sina;
+                x = this.z * sina + this.x * cosa;
+                return new Point3D(x,this.y, z);
+            }
+
+		this.rotateYc = function(angle) {
+                var rad, cosa, sina, x, z;
+                rad = angle * Math.PI / 180;
+                cosa = Math.cos(rad);
+                sina = Math.sin(rad);
+                z = this.z * cosa + this.x * sina;
+                x =  this.x * cosa - this.z * sina;
+                return new Point3D(x,this.y, z);
+            }
+ 
+ 
+            this.rotateZ = function(angle) {
+                var rad, cosa, sina, x, y;
+                rad = angle * Math.PI / 180;
+                cosa = Math.cos(rad);
+                sina = Math.sin(rad);
+                x = this.x * cosa - this.y * sina;
+                y = this.x * sina + this.y * cosa;
+                return new Point3D(x, y, this.z);
+            }
+
+		this.rotateZc = function(angle) {
+                var rad, cosa, sina, x, y;
+                rad = angle * Math.PI / 180;
+                cosa = Math.cos(rad);
+                sina = Math.sin(rad);
+                x = this.x * cosa + this.y * sina;
+                y = this.y * cosa - this.x * sina;
+                return new Point3D(x, y, this.z);
+            }
+ 
+            this.project = function(viewWidth, viewHeight, fov, viewDistance) {
+                var factor, x, y;
+                factor = fov / (viewDistance+.5);
+                x = this.x * factor + viewWidth / 2;
+                y = this.y * factor + viewHeight / 2;
+                return new Point3D(x, y, this.z);
+            }
+        }
+
+	var oldx=0;
+	var oldy=0;
+	var t = new Array();
+	var flag=0;
+	var flag1=0;
+
+	var mousemag = 0;
+	var velocity=0;
+	
+ 
+        var vertices = [
+            new Point3D(-2,2,-2),
+            new Point3D(2,2,-2),
+            new Point3D(2,-2,-2),
+            new Point3D(-2,-2,-2),
+	    new Point3D(-2,2,2),
+            new Point3D(2,2,2),
+            new Point3D(2,-2,2),
+            new Point3D(-2,-2,2)
+        ];
+ 
+        
+        var faces = [[0,1,2,3],[1,5,6,2],[5,4,7,6],[4,0,3,7],[0,4,5,1],[3,2,6,7]]
+ 
+        var angle = 0;
+	var direction = -1;
+	var v = vertices[0];
+ 
+        function startDemo() {
+            canvas = document.getElementById("thecanvas");
+            if( canvas && canvas.getContext ) {
+                ctx = canvas.getContext("2d");
+		//ctx.translate(canvas.width / 2, canvas.height / 2);
+
+		//ctx.rotate(30*Math.PI/180);
+                setInterval(loop,33);
+		
+
+            }
+        }
+	function slowDown(){
+	//	angle=1;
+	//	velocity=velocity/2;
+	//	flag=1;
+		mousemag=mousemag/10;
+	}
+
+	//function findDirection(){
+	//	document.getElementById("thecanvas").addEventListener("mousemove", findDirection2);
+
+	//}
+	findDirection2=function (e) {
+		
+		
+		
+    		if (e.which == 1) {
+
+		if(Math.abs(e.pageX - oldx) > Math.abs(e.pageY - oldy)){
+        	if (e.pageX < oldx) {
+            	direction = 1;
+		
+		//flag=0;
+		mousemag = Math.abs(e.pageX - oldx);
+        	} else if (e.pageX > oldx) {
+            	direction = 2;
+		//flag=0;
+		mousemag = Math.abs(e.pageX - oldx);}}
+		if(Math.abs(e.pageX - oldx) < Math.abs(e.pageY - oldy)){
+		if (e.pageY > oldy) {
+            	direction = 3;
+		//flag=0;
+		mousemag = Math.abs(e.pageY - oldy);
+        	} else if (e.pageY < oldy) {
+            	direction = 4;
+		//flag=0;
+		mousemag = Math.abs(e.pageY - oldy);
+
+        	}}
+		mousemag = mousemag*10;
+		
+
+		//if(oldx != e.pageX || oldy != e.pageY)
+			velocity=10;
+	
+
+        oldx = e.pageX;
+	oldy = e.pageY;}
+
+	}
+ 
+        function loop() {
+		document.getElementById("thecanvas").addEventListener("mousemove", findDirection2);
+		document.getElementById("thecanvas").addEventListener("click", slowDown);
+            
+ 		var t = new Array();
+            ctx.fillStyle = "rgb(255,255,255)";
+            ctx.fillRect(0,0,800,400);
+		
+
+	   document.getElementById("ab").innerHTML=velocity;
+ 
+            for( var i = 0; i < vertices.length; i++ ) {
+                //if(flag==0){
+			v = vertices[i];
+			//flag=1;
+		//}
+		//else
+			//v=t[i];
+//direction=3;
+		if(direction==1 && mousemag!=0){
+			var r = v.rotateY(angle);
+			vertices[i]=r;}
+		else if(direction==2 && mousemag!=0){
+			var r = v.rotateYc(angle);
+			vertices[i]=r;}
+		else if(direction==4 && mousemag!=0){
+			var r = v.rotateXc(angle);
+			vertices[i]=r;}
+		else if(direction==3 && mousemag!=0){
+			var r = v.rotateX(angle);
+			vertices[i]=r;}
+		else{
+			var r=v;
+		}
+
+		
+               var p = r.project(400,300,150,4);
+                t.push(p);
+		
+            }
+ 
+            ctx.strokeStyle = "rgb(255,55,255)";
+ 
+            for( var i = 0; i < faces.length; i++ ) {
+                var f = faces[i];
+                ctx.beginPath();
+                ctx.moveTo(t[f[0]].x,t[f[0]].y);
+                ctx.lineTo(t[f[1]].x,t[f[1]].y);
+                ctx.lineTo(t[f[2]].x,t[f[2]].y);
+                ctx.lineTo(t[f[3]].x,t[f[3]].y);
+                ctx.closePath();
+	
+		if(i==0){
+			ctx.fillStyle="#FFA305";
+			ctx.fill();}
+		else if(i==1){
+			ctx.fillStyle="#FF0000";
+			ctx.fill();}
+		else if(i==2){
+			ctx.fillStyle="#00FF00";
+			ctx.fill();}
+	
+		ctx.strokeStyle="#000000";
+                ctx.stroke();
+            }
+		if((.5*2*mousemag*mousemag>0 && velocity!=0)){
+            		//if(flag==1){
+			velocity = mousemag;
+			if(mousemag>500){
+				angle=8;
+				mousemag=mousemag-10;}
+ 
+			else if(mousemag>100){
+				angle=6;
+				mousemag=mousemag-5;}
+			else if(mousemag>50){
+				angle=5;
+				mousemag=mousemag-4;}
+			else if(mousemag>25){
+				angle=4;
+				mousemag=mousemag-3;}
+			else if(mousemag>15){
+				angle=3;
+				mousemag=mousemag-2;
+				}
+			else if(mousemag<=15){
+				angle=2;
+				mousemag=mousemag-1;
+				}
+			//mousemag--;
+			//velocity=velocity-2;
+			//}
+			//else{
+			//velocity = mousemag; 
+			//angle = 1;
+			//mousemag--;
+			//velocity=velocity/2;
+
+			//}
+			}
+		if(velocity <= 0)
+			angle=0;
+		//if(flag==1 && velocity!=0){
+			//angle=10;
+			//velocity=velocity/2;
+		//}
+		if(angle>360)
+	       		angle=angle-360;
+        }
+    </script>
+</head>
+<body>
+    <h2 align="center">
+    <canvas id="thecanvas" width="700" height="400" ></h2>
+        
+    </canvas>
+
+	<div id="ab"></div>
+</body>
+</html>
